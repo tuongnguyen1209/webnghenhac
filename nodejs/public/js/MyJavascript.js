@@ -36,9 +36,7 @@ let setCookie = (cname, val) => {
     document.cookie = cname + "=" + val + "; ";
 }
 
-if (getCookie() == null || getCookie() == "" || getCookie() == undefined) {
-    setLuotnghe('luotnghe', 0);
-}
+
 
 let getMusic = async (kw, page) => {
     let a = await fetch(`${domanin}?kw=${kw}&page=${page}`);
@@ -63,7 +61,10 @@ let login=async(usn,pws)=>{
     })
     return await a.json();
 }
-
+let loginfb=async()=>{
+    let a=await fetch(`/fb/auth`);
+    return await a.json();
+}
 let timKiem = () => {
     let loadmuic = document.getElementById("div_loadmusic");
     loadmuic.innerHTML = "";
@@ -115,7 +116,13 @@ let dangnhap = () => {
         }
     })
 }
-
+let dangnhapfb = () => {
+    
+    // console.log(username,pass)
+    loginfb().then(data=>{
+        console.log(data)
+    })
+}
 let themData = () => {
     let load = document.getElementById('div_load');
 
@@ -283,7 +290,9 @@ let downloadNhac=(keydownload)=>{
 
 
 window.onload = () => {
-    
+    if (getCookie() == null || getCookie() == "" || getCookie() == undefined) {
+        setLuotnghe('luotnghe', 0);
+    }
     loadUserFromCookie();
 
     let btnSearch = document.getElementById("btnsearch");
@@ -308,5 +317,8 @@ window.onload = () => {
     })
     document.getElementById('btnlogin').addEventListener('click',()=>{
         dangnhap();
+    })
+    document.getElementById('btnloginfb').addEventListener('click',()=>{
+        dangnhapfb();
     })
 }

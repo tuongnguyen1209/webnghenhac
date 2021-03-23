@@ -80,7 +80,9 @@ app.get("/", (req, res) => {
   res.render("index")
 })
 app.get('/gioithieu', (req, res) => {
-  res.render("gioithieu")
+  res.send('<h1>hi<h1>')
+  // res.render("gioithieu");
+
 })
 
 app.get("/manguon", (req, res) => {

@@ -5,6 +5,7 @@ let gototop = document.getElementById('gototop');
 let isplaying = false;
 let myaudio = document.getElementById('audio');
 let progress = document.getElementById('progress');
+let progress1 = $('#progress');
 let cdthumb = document.getElementsByClassName('cd-thumb')[0];
 let isChange = false;
 let dashboard = document.getElementsByClassName('dashboard')[0];
@@ -14,6 +15,8 @@ let background = document.getElementsByClassName('background')[0];
 let sttTimKiem = 0;
 let idplay;
 let isFinished = false;
+
+
 
 let getCookie = (cname = 'luotnghe') => {
     var name = cname + "=";
@@ -143,7 +146,9 @@ let themData = () => {
         kqsearch.innerText = musics[0].count;
         musics[1].datasong.forEach(music => {
 
-            let mis = `<div class="package__container" >
+            let mis = `<div class="package__container" id='sttnghe${sttTimKiem}' encryptKey="${music.encryptKey}"
+            youtokey="${music.keyyotu}" href="javascript:;"
+            onclick="loadNhac(${sttTimKiem},'${music.encryptKey}','${music.keyyotu}')" style='cursor: pointer;'>
             <div class="cover cover--6-month"
                 style="background: no-repeat url(${music.linkHinh}) center;"></div>
             <div class="package__info" style="width:40%">
@@ -157,15 +162,12 @@ let themData = () => {
                     <!-- <s class="old-price">354.000 VNĐ</s> -->
                 </div>
             </div>
-            <div class="package__action">
-                <a class="package__btn" id='sttnghe${sttTimKiem}' encryptKey="${music.encryptKey}"
-                    youtokey="${music.keyyotu}" href="javascript:;"
-                    onclick="loadNhac(${sttTimKiem},'${music.encryptKey}','${music.keyyotu}')">Nghe
-                    Nhạc</a>
+            <div class="package__action" style='margin:auto;'>
+                
             `;
             if (music.keyyotu == null || music.keyyotu == "" || music.keyyotu == undefined) {
                 mis += `<a class="package__btn btn_download" onclick="downloadNhac('${music.encryptKey}');"
-                href="javascript:;">Download</a>
+                href="javascript:;"><i class="fas fa-download"></i></a>
                 </div>
                 `
             }
@@ -351,7 +353,7 @@ let priMusic = () => {
                 loadNhac(idplay - i, enkey);
                 break;
             } else {
-                i--;
+                i++;
             }
         }
     } while (true);
@@ -403,13 +405,13 @@ function statusChangeCallback(response) {
         testAPI();
     } else if (response.status === 'not_authorized') {
         // The person is logged into Facebook, but not your app.
-        document.getElementById('status').innerHTML = 'Please log ' +
-            'into this app.';
+        // document.getElementById('status').innerHTML = 'Please log ' +
+        //     'into this app.';
     } else {
         // The person is not logged into Facebook, so we're not sure if
         // they are logged into this app or not.
-        document.getElementById('status').innerHTML = 'Please log ' +
-            'into Facebook.';
+        // document.getElementById('status').innerHTML = 'Please log ' +
+        //     'into Facebook.';
     }
 }
 // This function is called when someone finishes with the Login

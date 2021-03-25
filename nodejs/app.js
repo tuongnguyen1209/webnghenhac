@@ -7,8 +7,10 @@ let cheerio = require("cheerio");
 let request = require("request");
 const passport = require('passport');
 const cookieParser = require('cookie-parser');
-const FacebookStrategy  = require('passport-facebook').Strategy;
-const session  = require('express-session');
+const FacebookStrategy = require('passport-facebook').Strategy;
+const session = require('express-session');
+const ytgets = require('yt-gets');
+
 
 app.use(morgan("dev"));
 app.set("view engine", "ejs")
@@ -18,7 +20,7 @@ app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({ extended: true }));
 let urlParser = bodyParser.urlencoded({ extended: true })
 app.use(cookieParser());
-app.use(session({ secret: 'keyboard cat', key: 'sid'}));
+app.use(session({ secret: 'keyboard cat', key: 'sid' }));
 app.use(passport.initialize());
 app.use(passport.session())
 
@@ -27,9 +29,9 @@ passport.serializeUser((user, cb) => {
 })
 
 passport.deserializeUser((obj, cb) => {
-  
-    cb(null, obj);
-  
+
+  cb(null, obj);
+
 })
 passport.authenticate('facebook', { scope: ['publish_actions'] });
 
@@ -40,7 +42,7 @@ passport.use(new FacebookStrategy({
   callbackURL: 'http://localhost:7000/auth/fb/calblack',
 
 }, (accessToken, refreshToken, profile, done) => {
-  
+
   process.nextTick(function () {
     // console.log(accessToken, refreshToken, profile, done);
     return done(null, profile);
@@ -51,25 +53,25 @@ app.get('/fb/auth', passport.authenticate('facebook', { scope: ['email'] }));
 // xử lý sau khi user cho phép xác thực với facebook
 app.get('/auth/fb/calblack',
   passport.authenticate('facebook', {
-    
+
     successRedirect: '/loginsussces',
     failureRedirect: '/failed/login'
   })
 );
 
 app.use('/failed/login', (req, res, next) => {
-  res.send(JSON.stringify({'statusdn':500}))
+  res.send(JSON.stringify({ 'statusdn': 500 }))
 })
 
-app.use('/loginsussces',  (req, res) => {
-    // let use = req._;
-    // console.log(user.displayName)
-    
-    // console.log('dang nhap thanh cong ')
-    console.log(req.user.displayName)
-    res.send(JSON.stringify({ 'statusdn': 200 ,'username':req.user.displayName}))
-    // res.render('loginsussces')
-  })
+app.use('/loginsussces', (req, res) => {
+  // let use = req._;
+  // console.log(user.displayName)
+
+  // console.log('dang nhap thanh cong ')
+  console.log(req.user.displayName)
+  res.send(JSON.stringify({ 'statusdn': 200, 'username': req.user.displayName }))
+  // res.render('loginsussces')
+})
 
 app.use('/logout', (req, res, next) => {
   req.logout();
@@ -145,7 +147,16 @@ app.get("/manguon", (req, res) => {
 
   })
 })
-
+app.post('/downloadnhac',(req,res)=>{
+  let key = req.body.key;
+  let user= req.body.user;
+  console.log(user,key)
+  if(user!=null&&user!=''&&user!=undefined){
+    request(`http://m.nhaccuatui.com/ajax/get-media-info?key1=${key}`, function (error, response, body) {
+    res.send(body);
+  })
+  }
+})
 app.get("/hostkey", (req, res) => {
   var kw = req.query.kw;
 
@@ -174,6 +185,28 @@ app.get("/hostkey", (req, res) => {
       }
 
     })();
+  })
+})
+
+app.get('/musicyt', (req, res) => {
+  var key = req.query.key;
+  ytgets.fetch(`https://www.youtube.com/watch?v=${key}`).then((data) => {
+    console.log(data.media.audio)
+    res.send(JSON.stringify({
+      url:data.media.audio[0].url,
+      title:data.title,
+      singerTitle:data.author,
+      thumb:data.images[0].url
+    }))
+  }).catch((err) => {
+    console.log(err)
+  })
+})
+
+app.get("/infomusic", function (req, res) {
+  var key = req.query.key;
+  request(`http://m.nhaccuatui.com/ajax/get-media-info?key1=${key}`, function (error, response, body) {
+    res.send(body);
   })
 })
 

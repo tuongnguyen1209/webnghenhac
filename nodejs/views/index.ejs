@@ -113,22 +113,13 @@
                 display: none;
             }
         </style>
-        <script src="../stc-sp.zadn.vn/session-sdk/session-sdk.min.js"></script>
-        <script>
-            ZaloLoginWidget.init({
-                sessionName: 'zmp3_sid'
-            });
-        </script>
+
         <script type="text/javascript">
             //redirect to zingmp3.vn/vip
             //if (location.host.indexOf('zingmp3.vn') > -1 && location.host.indexOf('dev.zingmp3.vn') < 0) {
             //    var newdomain = location.href.replace('zingmp3.vn', 'mp3.zing.vn')
             //    location.href = newdomain;
             //}
-            if (location.host.indexOf('mp3.zing.vn') > -1) {
-                var newdomain = location.href.replace('mp3.zing.vn', 'zingmp3.vn')
-                location.href = newdomain;
-            }
 
 
             var MP3 = {
@@ -215,6 +206,7 @@
         }
     </style>
     <div class="background"></div>
+
     <div canvas="container">
         <div id="wrapper">
             <div class="wrapper-page">
@@ -225,23 +217,23 @@
                                 <div class="trigger-menu"><span class="three-bars-icon"></span></div>
                             </div>
                             <div class="logo-container">
-                                <a href="index.html" title="Zing Mp3">Zing Mp3 - VIP</a>
+                                <a href="./" title="Zing Mp3">Zing Mp3 - VIP</a>
                             </div>
 
-                            <!-- <a class="fn-login link-login show-on-small" href="#">Đăng nhập</a>
+                            <a class="fn-login link-login show-on-small" href="#">Đăng nhập</a>
 
                             <div class="user-profile user-mb show-on-small hidden">
 
                             </div>
                             <div class="menu-container">
-                                <ul>
+                                <!-- <ul>
                                     <li><a class="active" title="VIP" href="vip.html">VIP</a></li>
                                     <li><a title="Gói data"
                                             href="http://zaloplus.vn/?utm_source=vip_zlp_mp3&amp;utm_medium=menu&amp;utm_campaign=wap_menu&amp;app=mp3">Gói
                                             data</a></li>
                                     <li><a class="" title="VIP Family" href="vip-gia-dinh.html">VIP Family</a></li>
-                                </ul>
-                            </div> -->
+                                </ul> -->
+                            </div>
                             <div class="menu-user">
                                 <ul>
 
@@ -256,12 +248,14 @@
                                 </ul>
                             </div>
                         </div>
-                        
+
                     </section>
+
                     <section class="body">
                         <div class="body-container">
                             <div class="cover-container cover-home">
-                                <div class="inside"><span class="logo-mp3"></span>
+                                <div class="inside">
+                                    <canvas id="output" height="100px" width="100px"></canvas>
                                     <h2>Tìm kiếm</h2>
                                     <!-- <h3>Trở thành VIP với 49.000 VNĐ/ tháng</h3> -->
                                     <div class="conver-content">
@@ -286,6 +280,8 @@
                                     </div>
 
                                 </div>
+
+
                                 <div id="div_loadmusic" class="package"
                                     style="position: relative;top: 20px;padding-bottom: 50px;">
                                     <!-- <div class="package__container">
@@ -311,6 +307,7 @@
                                         </div>
                                         
                                     </div> -->
+
 
                                 </div>
                                 <div class="hidden" id="div_load" style="display: none;">
@@ -401,12 +398,14 @@
                 </div>
             </div>
         </div>
-        <div class="w-30">
+        <div class="w-30" style="position: relative;">
             <header id="songisplaying">
                 <h4>Now playing:</h4>
                 <h2 id="namesong">String 57th & 9th</h2>
                 <h3 id="tencasi"></h3>
             </header>
+            <canvas id="output2" height="500" width="500"></canvas>
+
         </div>
 
         <!-- Control -->
@@ -435,6 +434,7 @@
 
             <audio id="audio" src=""></audio>
         </div>
+        <!-- <canvas id="output2" height="100" width="100%"></canvas> -->
     </div>
     <div class="modal fade in" id="modal-login" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel"
         aria-hidden="true" style="display: none;z-index: 15;">
@@ -473,6 +473,8 @@
             </div><a class="func-close-mobile" title="Đóng lại" data-dismiss="modal" aria-label="Close">Đóng</a>
         </div>
     </div>
+
+
     <iframe id="my_iframedownload" style="display:none;"></iframe>
 
     <!-- <div class="hoamai">
@@ -489,14 +491,9 @@
             })
         });
     </script>
-
-    <script src="../assets/js/main.js"></script>
-    <script src="../assets/js/swiper.min.js"></script>
-    <script type="text/javascript"></script>
-
-
-
     <script src="../assets/js/MyJavascript.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/foobar404/wave.js/dist/bundle.iife.js"></script>
+    <script src="../assets/js/wave.js"></script>
 </body>
 
 <!-- Mirrored from zingmp3.vn/vip by HTTrack Website Copier/3.x [XR&CO'2014], Tue, 02 Mar 2021 04:22:31 GMT -->

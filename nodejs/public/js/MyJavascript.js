@@ -1,3 +1,5 @@
+
+
 let domanin = "./manguon";
 let page = 1;
 let checkTimKiem = false;
@@ -15,7 +17,8 @@ let background = document.getElementsByClassName('background')[0];
 let sttTimKiem = 0;
 let idplay;
 let isFinished = false;
-
+let isRepeat = false;
+let isRandom = false;
 
 
 let getCookie = (cname = 'luotnghe') => {
@@ -47,11 +50,26 @@ let getMusic = async (kw, page) => {
     let a = await fetch(`${domanin}?kw=${kw}&page=${page}`);
     return await a.json();
 }
+let download = async (kw) => {
+    let a = await fetch(`./downloadnhac`, {
+        method: 'POST',
+        body: JSON.stringify({
+            'key': kw,
+            'user': getCookie('username'),
+        }),
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    });
+    return await a.json();
+
+}
 
 let getLinkMusic = async (key1) => {
-    let a = await fetch(`http://m.nhaccuatui.com/ajax/get-media-info?key1=${key1}`);
+    let a = await fetch(`./infomusic?key=${key1}`);
     return await a.json();
 }
+
 
 let login = async (usn, pws) => {
     let a = await fetch(`./login`, {
@@ -183,7 +201,7 @@ let themData = () => {
 }
 
 let loadNhac = (play, encryptkey = '', keyouto = '') => {
-    // console.log(luotNghe)
+
     if (getCookie('luotnghe') > 5 && !islogin) {
         alert("ban da nghe qua 5 lan, vui long dang nhap de nghe");
         openlogin();
@@ -193,7 +211,7 @@ let loadNhac = (play, encryptkey = '', keyouto = '') => {
 
         if (encryptkey != undefined) {
             idplay = play;
-            let parrent = document.getElementById(`sttnghe${idplay}`).parentElement.parentElement;
+            let parrent = document.getElementById(`sttnghe${idplay}`);
             let background = parrent.getElementsByClassName('cover')[0];
             background.style.background = " no-repeat url('../assets/images/playmusic.gif') center;";
             let offsety = parrent.offsetTop + $(window).height() * 0.8;
@@ -289,13 +307,18 @@ myaudio.ontimeupdate = () => {
     }
 }
 myaudio.onended = () => {
-    nextMusic();
+    console.log(myaudio.loop)
+    if (!isRepeat) {
+
+
+        nextMusic();
+    }
 }
 
 let downloadNhac = (keydownload) => {
-    console.log('vo day')
+    // console.log('vo day')
     if (getCookie('username') != '') {
-        getLinkMusic(keydownload).then(links => {
+        download(keydownload).then(links => {
             // console.log() 
 
             document.getElementById('my_iframedownload').src = links.data.location;
@@ -312,22 +335,36 @@ let nextMusic = () => {
     let a;
     let enkey;
 
+    let slmusic = document.getElementsByClassName('package__container').length
+    let idrandom;
     do {
-        a = document.getElementById(`sttnghe${idplay + i}`);
+        if (isRandom) {
+            idrandom = Math.trunc(Math.random() * slmusic + 1);
+            if(idrandom==idplay){
+                continue;
+            }
+            a = document.getElementById(`sttnghe${idrandom}`);
+        } else {
+            a = document.getElementById(`sttnghe${idplay + i}`);
+        }
         // console.log(a);
         if (a == null && checkTimKiem) {
 
-            if (!isFinished) {
+            if (!isFinished && !isRandom) {
                 page++;
                 themData();
 
-            } else {
+            }  else {
                 continue;
             }
         } else {
             enkey = a.getAttribute('encryptKey');
             if (enkey != 'undefined' && enkey != '' && enkey != null && enkey != undefined) {
-                loadNhac(idplay + i, enkey);
+                if(!isRandom){
+                    loadNhac(idplay + i, enkey);
+                }else{
+                    loadNhac(idrandom, enkey);
+                }
                 break;
             } else {
                 i++;
@@ -386,82 +423,111 @@ window.onload = () => {
             playAudio();
         }
     })
+    document.getElementsByClassName('btn-repeat')[0].addEventListener('click', () => {
+
+
+        if (isRepeat) {
+            isRepeat = false;
+            myaudio.loop = false;
+            document.getElementsByClassName('btn-repeat')[0].classList.remove('buttonclick');
+
+        } else {
+            isRepeat = true;
+            myaudio.loop = true;
+            document.getElementsByClassName('btn-repeat')[0].classList.add('buttonclick');
+        }
+        // console.log(isRepeat)
+    })
+    document.getElementsByClassName('btn-random')[0].addEventListener('click', () => {
+
+
+        if (isRandom) {
+            isRandom = false;
+            document.getElementsByClassName('btn-random')[0].classList.remove('buttonclick');
+
+        } else {
+            isRandom = true;
+            document.getElementsByClassName('btn-random')[0].classList.add('buttonclick');
+        }
+        // console.log(isRepeat)
+    })
     document.getElementById('btnlogin').addEventListener('click', () => {
         dangnhap();
     })
-    // document.getElementById('btnloginfb').addEventListener('click', () => {
-    //      dangnhapfb();
-    // })
+
+
 }
-function statusChangeCallback(response) {
-    console.log('statusChangeCallback');
-    console.log(response);
-    // The response object is returned with a status field that lets the
-    // app know the current login status of the person.
-    // Full docs on the response object can be found in the documentation
-    // for FB.getLoginStatus().
-    if (response.status === 'connected') {
-        // Logged into your app and Facebook.
-        testAPI();
-    } else if (response.status === 'not_authorized') {
-        // The person is logged into Facebook, but not your app.
-        // document.getElementById('status').innerHTML = 'Please log ' +
-        //     'into this app.';
-    } else {
-        // The person is not logged into Facebook, so we're not sure if
-        // they are logged into this app or not.
-        // document.getElementById('status').innerHTML = 'Please log ' +
-        //     'into Facebook.';
+{
+    function statusChangeCallback(response) {
+        // console.log('statusChangeCallback');
+        // console.log(response);
+        // The response object is returned with a status field that lets the
+        // app know the current login status of the person.
+        // Full docs on the response object can be found in the documentation
+        // for FB.getLoginStatus().
+        if (response.status === 'connected') {
+            // Logged into your app and Facebook.
+            testAPI();
+        } else if (response.status === 'not_authorized') {
+            // The person is logged into Facebook, but not your app.
+            // document.getElementById('status').innerHTML = 'Please log ' +
+            //     'into this app.';
+        } else {
+            // The person is not logged into Facebook, so we're not sure if
+            // they are logged into this app or not.
+            // document.getElementById('status').innerHTML = 'Please log ' +
+            //     'into Facebook.';
+        }
     }
-}
-// This function is called when someone finishes with the Login
-// Button.  See the onlogin handler attached to it in the sample
-// code below.
-function checkLoginState() {
-    FB.getLoginStatus(function (response) {
-        statusChangeCallback(response);
-    });
-}
-window.fbAsyncInit = function () {
-    FB.init({
-        appId: '787523385183352',
-        cookie: true,  // enable cookies to allow the server to access the session
-        xfbml: true,  // parse social plugins on this page
-        version: 'v2.5' // use graph api version 2.5
-    });
-    // Now that we've initialized the JavaScript SDK, we call 
-    // FB.getLoginStatus().  This function gets the state of the
-    // person visiting this page and can return one of three states to
-    // the callback you provide.  They can be:
-    //
-    // 1. Logged into your app ('connected')
-    // 2. Logged into Facebook, but not your app ('not_authorized')
-    // 3. Not logged into Facebook and can't tell if they are logged into
-    //    your app or not.
-    //
-    // These three cases are handled in the callback function.
-    FB.getLoginStatus(function (response) {
-        statusChangeCallback(response);
-    });
-};
-// Load the SDK asynchronously
-(function (d, s, id) {
-    var js, fjs = d.getElementsByTagName(s)[0];
-    if (d.getElementById(id)) return;
-    js = d.createElement(s); js.id = id;
-    js.src = "https://connect.facebook.net/vi_VN/sdk.js";
-    fjs.parentNode.insertBefore(js, fjs);
-}(document, 'script', 'facebook-jssdk'));
-// Here we run a very simple test of the Graph API after login is
-// successful.  See statusChangeCallback() for when this call is made.
-function testAPI() {
-    // console.log('Welcome!  Fetching your information.... ');
-    FB.api('/me', function (response) {
-        // console.log('Successful login for: ' + response.name);
-        // document.getElementById('status').innerHTML =
-        // 'Thanks for logging in, ' + response.name + '!';
-        setCookie('username', response.name);
-        loadUserFromCookie();
-        closelogin();
-    });
+    // This function is called when someone finishes with the Login
+    // Button.  See the onlogin handler attached to it in the sample
+    // code below.
+    function checkLoginState() {
+        FB.getLoginStatus(function (response) {
+            statusChangeCallback(response);
+        });
+    }
+    window.fbAsyncInit = function () {
+        FB.init({
+            appId: '787523385183352',
+            cookie: true,  // enable cookies to allow the server to access the session
+            xfbml: true,  // parse social plugins on this page
+            version: 'v2.5' // use graph api version 2.5
+        });
+        // Now that we've initialized the JavaScript SDK, we call 
+        // FB.getLoginStatus().  This function gets the state of the
+        // person visiting this page and can return one of three states to
+        // the callback you provide.  They can be:
+        //
+        // 1. Logged into your app ('connected')
+        // 2. Logged into Facebook, but not your app ('not_authorized')
+        // 3. Not logged into Facebook and can't tell if they are logged into
+        //    your app or not.
+        //
+        // These three cases are handled in the callback function.
+        FB.getLoginStatus(function (response) {
+            statusChangeCallback(response);
+        });
+    };
+    // Load the SDK asynchronously
+    (function (d, s, id) {
+        var js, fjs = d.getElementsByTagName(s)[0];
+        if (d.getElementById(id)) return;
+        js = d.createElement(s); js.id = id;
+        js.src = "https://connect.facebook.net/vi_VN/sdk.js";
+        fjs.parentNode.insertBefore(js, fjs);
+    }(document, 'script', 'facebook-jssdk'));
+    // Here we run a very simple test of the Graph API after login is
+    // successful.  See statusChangeCallback() for when this call is made.
+    function testAPI() {
+        // console.log('Welcome!  Fetching your information.... ');
+        FB.api('/me', function (response) {
+            // console.log('Successful login for: ' + response.name);
+            // document.getElementById('status').innerHTML =
+            // 'Thanks for logging in, ' + response.name + '!';
+            setCookie('username', response.name);
+            loadUserFromCookie();
+            closelogin();
+        });
+    }
 }
